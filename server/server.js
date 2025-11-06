@@ -1,18 +1,17 @@
-const express = require('express');
+require('dotenv').config();
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
+const express = require('express');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const donationRoutes = require('./routes/donationRoutes');
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-mongoose.connect('mongodb://127.0.0.1:27017/exp8db', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => console.log('✅ MongoDB connected'))
-  .catch(err => console.log(err));
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('✅ MongoDB Atlas connected'))
+  .catch(err => console.log('❌ Connection error:', err));
 
 app.use('/api/donations', donationRoutes);
 
