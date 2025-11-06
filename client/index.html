@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Donation Platform</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Online Donation and Fundraising Platform</h2>
+
+  <div id="totalSection">
+    <h3>Total Donations: ₹<span id="totalAmount">0</span></h3>
+  </div>
+
+  <form id="donationForm">
+    <input type="text" id="donorName" placeholder="Your Name" required>
+    <input type="number" id="amount" placeholder="Amount" required>
+    <input type="text" id="message" placeholder="Message" required>
+    <button type="submit">Donate</button>
+  </form>
+
+  <table id="donationsTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Amount (₹)</th>
+        <th>Message</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const API_URL = 'http://localhost:5000/api/donations';
+
+    async function loadDonations() {
+      const res = await fetch(API_URL);
+      const donations = await res.json();
+
+      // Update table
+      const tbody = document.querySelector('#donationsTable tbody');
+      tbody.innerHTML = '';
+      let total = 0;
+
+      donations.forEach(d => {
+        total += d.amount;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${d.donorName}</td>
+          <td>${d.amount}</td>
+          <td>${d.message}</td>
+          <td><button onclick="deleteDonation('${d._id}')">🗑️ Delete</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      // Update total amount
+      document.getElementById('totalAmount').textContent = total.toFixed(2);
+    }
+
+    document.getElementById('donationForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const donorName = document.getElementById('donorName').value;
+      const amount = parseFloat(document.getElementById('amount').value);
+      const message = document.getElementById('message').value;
+
+      await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ donorName, amount, message })
+      });
+
+      e.target.reset();
+      loadDonations();
+    });
+
+    async function deleteDonation(id) {
+      await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      loadDonations();
+    }
+
+    loadDonations();
+  </script>
+</body>
+</html>
+
