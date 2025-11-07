@@ -18,7 +18,7 @@ A total donation counter is also displayed.
 **Clone the repository**
 ```bash
 git clone https://github.com/itsjamestom/wbexp8.git
-cd exp8
+cd wbexp8
 npm install
 ```
 **Start both the backend and frontend servers:**
